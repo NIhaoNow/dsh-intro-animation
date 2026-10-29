@@ -1,7 +1,7 @@
 {
   "name": "dsh-intro-animation",
-  "version": "0.1.0",
-  "description": "Opening animation (splash) for the DeepSeek Harness Web UI: plays a bundled video once per browser session, over a frame-wide overlay.",
+  "version": "0.2.0",
+  "description": "Opening animation for the DeepSeek Harness Web UI: a boot splash painted into the served index before the app mounts, plus a frame-wide overlay fallback.",
   "private": true,
   "type": "module",
   "icon": "icon.svg",
@@ -15,6 +15,7 @@
   "files": [
     "index.js",
     "client.js",
+    "splash.js",
     "cordis.patch.yml",
     "icon.svg",
     "locale/*.json",

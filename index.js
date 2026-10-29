@@ -20,6 +20,8 @@ import { homedir } from 'node:os'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { buildSplashRows } from './splash.js'
+
 const PACKAGE_ROOT = dirname(fileURLToPath(import.meta.url))
 const ROUTE_PREFIX = '/dsh-intro-animation'
 
@@ -155,6 +157,25 @@ export const inject = ['webServer']
  * @param {import('@deepseek-ai/cordis').Context} ctx
  */
 export function apply(ctx) {
+  // ① Boot splash: contributes index-injection rows so the animation paints before the
+  //    app mounts. Must be registered synchronously here, before anything can await:
+  //    the index table is collected at host startup, and a late registration would be a
+  //    splash that never ships. A failure here costs only the splash, never the document.
+  ctx.effect(
+    () =>
+      ctx.on('webserver/index-inject', (table) => {
+        if (!Array.isArray(table)) return
+        try {
+          if (!resolveVideo()) return
+          table.push(...buildSplashRows())
+        } catch {
+          /* no splash is an acceptable outcome; a broken index document is not */
+        }
+      }),
+    'dsh-intro-animation: boot splash',
+  )
+
+  // ② Media route: the bytes both halves play.
   ctx.effect(
     () =>
       ctx.webServer.register({

@@ -8,13 +8,20 @@
 import { createServer } from 'node:http'
 import { apply, inject, name } from '../index.js'
 
-/** Minimal Cordis context: capture the route the plugin registers. */
+/** Minimal Cordis context: capture the route and the index-injection listener. */
 const registered = []
+const listeners = new Map()
 const ctx = {
   effect(factory, label) {
     const dispose = factory()
     registered.push({ label, dispose })
     return dispose
+  },
+  on(event, listener) {
+    listeners.set(event, listener)
+    return () => {
+      listeners.delete(event)
+    }
   },
   webServer: {
     register(route) {
@@ -28,6 +35,32 @@ const ctx = {
 
 if (!inject.includes('webServer')) throw new Error('expected webServer in inject')
 apply(ctx)
+
+// ── boot splash rows ──────────────────────────────────────────────────────────
+const injectListener = listeners.get('webserver/index-inject')
+if (!injectListener) throw new Error('plugin did not subscribe to webserver/index-inject')
+
+const table = []
+injectListener(table)
+if (table.length !== 2) throw new Error(`expected 2 injection rows, got ${table.length}`)
+
+const [styleRow, scriptRow] = table
+if (styleRow.kind !== 'style') throw new Error(`first row must be the style row, got ${styleRow.kind}`)
+if (scriptRow.kind !== 'script' || scriptRow.placement !== 'body') {
+  throw new Error(`second row must be a body script, got ${scriptRow.kind}/${scriptRow.placement}`)
+}
+for (const [index, row] of table.entries()) {
+  if (typeof row.text !== 'string' || row.text.length === 0) throw new Error(`row ${index} has no text`)
+  // An inline script row is embedded literally into the served document: a closing tag
+  // inside it would end the script early and leave the rest as body text.
+  if (row.text.includes('</script')) throw new Error(`row ${index} contains a closing script tag`)
+  if (row.text.includes('</style')) throw new Error(`row ${index} contains a closing style tag`)
+}
+// The runtime must be syntactically valid ES5-ish script the page can execute inline.
+new Function(scriptRow.text) // eslint-disable-line no-new-func
+if (!styleRow.text.includes('#dsi-boot')) throw new Error('style row does not style the splash')
+if (!scriptRow.text.includes('/dsh-intro-animation/video')) throw new Error('script row does not play the route')
+console.log(`index rows ok: style ${styleRow.text.length}ch, script ${scriptRow.text.length}ch`)
 
 const route = registered.find((entry) => entry.route)?.route
 if (!route) throw new Error('plugin did not register a route')

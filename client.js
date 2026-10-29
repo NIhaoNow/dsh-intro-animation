@@ -25,7 +25,10 @@ window.__ModuleLoader__.load({
     const SLOT_ID = 'intro-animation'
     // Bump the suffix when the animation should play once more for people who have
     // already seen the previous one (the stored flag lives in sessionStorage).
-    const SESSION_KEY = 'dsh.intro-animation.shown.v2'
+    const SESSION_KEY = 'dsh.intro-animation.shown.v3'
+    // Written by the boot-splash script: this page load is already owned by the splash,
+    // so this overlay must stay out of the way (it is only the fallback path).
+    const BOOT_KEY = 'dsh.intro-animation.booting'
     const FADE_OUT_MS = 520
     const CSS_TAG = 'dsh-intro-animation/style.css'
 
@@ -57,6 +60,8 @@ window.__ModuleLoader__.load({
     /** Should this page load start the intro? */
     function shouldPlay() {
       try {
+        // The Host-side boot splash already covers this load; never play twice.
+        if (window.sessionStorage.getItem(BOOT_KEY) === '1') return false
         if (String(window.location.hash || '') === '#intro') return true
         if (String(window.location.search || '').indexOf('intro=1') >= 0) return true
         return window.sessionStorage.getItem(SESSION_KEY) !== '1'
