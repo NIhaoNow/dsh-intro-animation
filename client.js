@@ -23,7 +23,9 @@ window.__ModuleLoader__.load({
     const NAME = 'dsh-intro-animation'
     const SLOT = 'shell.overlay'
     const SLOT_ID = 'intro-animation'
-    const SESSION_KEY = 'dsh.intro-animation.shown'
+    // Bump the suffix when the animation should play once more for people who have
+    // already seen the previous one (the stored flag lives in sessionStorage).
+    const SESSION_KEY = 'dsh.intro-animation.shown.v2'
     const FADE_OUT_MS = 520
     const CSS_TAG = 'dsh-intro-animation/style.css'
 
