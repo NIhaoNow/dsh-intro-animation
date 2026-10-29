@@ -22,6 +22,7 @@
     "scripts/encode.mjs",
     "scripts/smoke.mjs",
     "scripts/preview-page.mjs",
+    "docs/*",
     "README.md",
     "LICENSE"
   ],

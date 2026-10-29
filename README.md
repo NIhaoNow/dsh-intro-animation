@@ -4,7 +4,13 @@ A DeepSeek Harness **bundle plugin** that plays a video as a full-window opening
 animation when the Web UI loads — once per browser session, skippable, theme-aware,
 and replaceable with your own clip.
 
-https://github.com/ciel007/dsh-intro-animation
+https://github.com/NIhaoNow/dsh-intro-animation
+
+![The overlay playing the bundled clip](docs/preview.png)
+
+<sub>The overlay as rendered by this plugin's markup and CSS in Chromium, playing the
+bundled clip served from the harness route (screenshot taken 2026-10-29).</sub>
+
 
 - **Client half** registers one entry in the `shell.overlay` slot: a backdrop, a
   vertical 3:4 card, the `<video>`, a progress hairline, and a skip control.
@@ -31,7 +37,7 @@ plugin_manager  action: install_bundle  target: <absolute path to this folder>
 or, once published, by package spec:
 
 ```
-plugin_manager  action: install_bundle  target: github:ciel007/dsh-intro-animation
+plugin_manager  action: install_bundle  target: github:NIhaoNow/dsh-intro-animation
 ```
 
 The plugin manager owns the profile `package.json` and bundle list — do not edit
@@ -122,6 +128,23 @@ icon.svg            Package icon
 | `/dsh-intro-animation/poster` (`.jpg`) | the poster image |
 
 `GET` and `HEAD` only; anything else is `405`.
+
+## Checking it works
+
+```
+node scripts/smoke.mjs        # mounts the Host route on a throwaway http server
+node scripts/preview-page.mjs # writes .preview/intro-preview.html with this plugin's
+                              # own CSS + markup pointed at the running harness
+```
+
+`smoke.mjs` exercises `/info`, `/video`, `/poster`, an unknown path and a `POST`,
+and fails if a body length disagrees with `content-length`. `preview-page.mjs` copies
+the CSS array out of `client.js` (so the preview cannot drift) and is the quickest way
+to eyeball the card in a browser without reloading the harness page.
+
+After installing into a harness, the fastest live checks are
+`curl http://127.0.0.1:<port>/dsh-intro-animation/info` and the slot inspector for
+`shell.overlay` (an entry with id `intro-animation` should be `active`).
 
 ## Uninstall
 
