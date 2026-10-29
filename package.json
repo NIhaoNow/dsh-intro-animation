@@ -1,0 +1,50 @@
+{
+  "name": "dsh-intro-animation",
+  "version": "0.1.0",
+  "description": "Opening animation (splash) for the DeepSeek Harness Web UI: plays a bundled video once per browser session, over a frame-wide overlay.",
+  "private": true,
+  "type": "module",
+  "icon": "icon.svg",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./media/*": "./media/*"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "media/*",
+    "scripts/encode.mjs",
+    "scripts/smoke.mjs",
+    "scripts/preview-page.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "intro",
+    "opening-animation",
+    "splash",
+    "cordis"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Opening Animation",
+    "description": "Plays a bundled video as a full-window opening animation once per browser session. Skippable, theme-aware, with drop-in media overrides."
+  }
+}
